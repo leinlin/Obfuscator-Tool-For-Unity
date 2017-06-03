@@ -1,9 +1,11 @@
 # Obfuscator Tool For Unity
 
 
-###Use:
+Use:
+-----------------------------------  
 Tap Obfuscator Menu And Click Start, Select a Dll file，Enjoy
 
-###Code
+Code
+-----------------------------------  
 ObfuscatorTool.cs contains the obfuscator Api
 
