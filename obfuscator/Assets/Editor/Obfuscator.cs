@@ -331,6 +331,9 @@ namespace SharpObfuscator.Obfuscation2 {
             if ((type.Attributes & Mono.Cecil.TypeAttributes.Serializable) != 0) {
                 return true;
             }
+            if (CustomExcludeFun != null && CustomExcludeFun(type)) {
+                return true;
+            }
             string fullName = type.FullName;
             foreach (var name in _excludedBaseTypePartner) {
                 if (IsBaseOnTargetStr(type, name)) {
@@ -346,9 +349,6 @@ namespace SharpObfuscator.Obfuscation2 {
                 if (name.Contains(fullName)) {
                     return true;
                 }
-            }
-            if (CustomExcludeFun != null) {
-                return CustomExcludeFun(type);
             }
             return false;
         }

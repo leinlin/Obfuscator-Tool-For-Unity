@@ -44,12 +44,18 @@ namespace SharpObfuscator.Obfuscation2 {
     public class ObfuscatorTool {
 
         #region obfuscator api
+        public static void Obfuscator(string path) {
+            ObfuscatorDllByPath(path, true);
+        }
         [MenuItem("Obfuscator/Start")]
         private static void ObfuscatorDll() {
             string path = EditorUtility.OpenFilePanel("", "", "*");
             obfuscatorDllByPath(path);
         }
         private static void obfuscatorDllByPath(string path) {
+            ObfuscatorDllByPath(path, false);
+        }
+        private static void ObfuscatorDllByPath(string path, bool isBatchMode) {
             string folder = path.Replace(Path.GetFileName(path), "");
             if (File.Exists(path)) {
                 DirectoryInfo info = new DirectoryInfo(Application.dataPath);
@@ -70,13 +76,19 @@ namespace SharpObfuscator.Obfuscation2 {
                 //add the class use reflect, such as the classes inherit MonoBehavouir
                 //the string just is partner of baseType's fullName
                 obfuscator.ExcludeBase("UnityEngine");
+                //obfuscator.CustomExcludeFun += you function
+                //like just obfuscator you code namespace
                 #endregion
 
                 obfuscator.AddAssembly(path, true);
-                obfuscator.Progress += obfuscator_NameObfuscated;
+                if (!isBatchMode) {
+                    obfuscator.Progress += obfuscator_NameObfuscated;
+                }
                 obfuscator.StartObfuscation();
             }
-            EditorUtility.ClearProgressBar();
+            if (!isBatchMode) {
+                EditorUtility.ClearProgressBar();
+            }
         }
         #endregion
 
