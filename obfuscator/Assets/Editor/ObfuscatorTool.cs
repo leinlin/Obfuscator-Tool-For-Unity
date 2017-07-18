@@ -43,7 +43,7 @@ using System.Text.RegularExpressions;
 namespace SharpObfuscator.Obfuscation2 {
     public class ObfuscatorTool {
 
-        #region obfuscator api
+        #region one file
         public static void Obfuscator(string path) {
             ObfuscatorDllByPath(path, true);
         }
@@ -52,6 +52,7 @@ namespace SharpObfuscator.Obfuscation2 {
             string path = EditorUtility.OpenFilePanel("", "", "*");
             obfuscatorDllByPath(path);
         }
+
         private static void obfuscatorDllByPath(string path) {
             ObfuscatorDllByPath(path, false);
         }
@@ -92,7 +93,58 @@ namespace SharpObfuscator.Obfuscation2 {
         }
         #endregion
 
+        #region folder
+        [MenuItem("Obfuscator/Start by folder")]
+        private static void ObfuscatorDllByFolder() {
+            string path = EditorUtility.OpenFolderPanel("", "", "*");
+            List<string> dllPaths = new List<string>();
+            DirectoryInfo info = new DirectoryInfo(path);
+            FindDllFile(info, dllPaths);
+
+            ObfuscatorDllByPathList(path, dllPaths, false);
+        }
+        public static void ObfuscatorDllByPathList(string folder, List<string> path, bool isBatchMode) {
+            EditorUtility.ClearProgressBar();
+            Obfuscator obfuscator = new Obfuscator(folder, true, true, false, true, true);
+
+            #region exclude
+            //TODO
+            //add the class use reflect, such as the classes inherit MonoBehavouir
+            //the string just is partner of baseType's fullName
+            obfuscator.ExcludeBase("UnityEngine");
+            //obfuscator.CustomExcludeFun += you function
+            //like just obfuscator you code namespace
+            #endregion
+
+            for (int i = 0, imax = path.Count; i < imax; ++i) {
+                obfuscator.AddAssembly(path[i], true);
+            }
+            if (!isBatchMode) {
+                obfuscator.Progress += obfuscator_NameObfuscated;
+            }
+            obfuscator.StartObfuscation();
+            if (!isBatchMode) {
+                EditorUtility.ClearProgressBar();
+            }
+        }
+        #endregion
+
         #region search json class
+        private static void FindDllFile(DirectoryInfo dir, List<string> result) {
+            FileInfo[] files = dir.GetFiles("*.dll");
+
+            foreach (FileInfo item in files) {
+                if (item.Extension != ".dll") {
+                    continue;
+                }
+                result.Add(item.FullName.Replace('\\', '/'));
+            }
+
+            DirectoryInfo[] dis = dir.GetDirectories();
+            foreach (DirectoryInfo di in dis) {
+                FindDllFile(di, result);
+            }
+        }
         private static void FindJsonClassInProject(DirectoryInfo dir, HashSet<string> result) {
             FileInfo[] files = dir.GetFiles("*.cs");
 

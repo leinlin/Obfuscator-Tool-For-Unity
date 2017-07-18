@@ -305,7 +305,7 @@ namespace SharpObfuscator.Obfuscation2 {
             //---- Prepare ressources names
             if (!initialTypeName.Contains("/")) {
                 // Save the obfuscation mapping
-                _resourcesMapping.Add(initialTypeName, type.FullName);
+                _resourcesMapping[initialTypeName] = type.FullName;
             }
 
             //---- Update the type references in other assemblies
